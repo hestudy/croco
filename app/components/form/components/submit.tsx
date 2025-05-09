@@ -8,7 +8,11 @@ export default function FSubmit(props: ComponentProps<"button">) {
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button {...props} disabled={isSubmitting || props.disabled}>
+        <Button
+          {...props}
+          disabled={isSubmitting || props.disabled}
+          onClick={() => form.handleSubmit()}
+        >
           {isSubmitting && (
             <LoaderCircleIcon
               className="-ms-1 animate-spin"

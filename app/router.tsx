@@ -14,6 +14,12 @@ export function createRouter() {
       context: {
         queryClient,
       },
+      defaultNotFoundComponent(props) {
+        return <div>Not Found</div>;
+      },
+      defaultErrorComponent(props) {
+        return <div>Error</div>;
+      },
     }) as any,
     queryClient
   );

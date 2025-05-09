@@ -1,17 +1,33 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { z } from "zod";
+import { useAppForm } from "./form/form-hook";
+import { authClient } from "~/lib/auth-client";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async (props) => {
+      const res = await authClient.signIn.email({
+        email: props.value.email,
+        password: props.value.password,
+      });
+      if (res.data?.user) {
+      }
+    },
+  });
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form.AppForm>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a
@@ -32,18 +48,35 @@ export function LoginForm({
             </div>
           </div>
           <div className="flex flex-col gap-6">
-            <div className="grid gap-3">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
+            <form.AppField
+              name="email"
+              validators={{
+                onChange: z.string().email("Invalid email"),
+              }}
+              children={(field) => {
+                return (
+                  <field.FInput label="Email" placeholder="m@example.com" />
+                );
+              }}
+            />
+            <form.AppField
+              name="password"
+              validators={{
+                onChange: z
+                  .string()
+                  .min(8, "Password must be at least 8 characters"),
+              }}
+              children={(field) => {
+                return (
+                  <field.FInput
+                    label="Password"
+                    placeholder="********"
+                    type="password"
+                  />
+                );
+              }}
+            />
+            <form.FSubmit className="w-full">Login</form.FSubmit>
           </div>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
@@ -71,7 +104,7 @@ export function LoginForm({
             </Button>
           </div>
         </div>
-      </form>
+      </form.AppForm>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
