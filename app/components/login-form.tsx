@@ -2,25 +2,37 @@ import { GalleryVerticalEnd } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { z } from "zod";
-import { useAppForm } from "./form/form-hook";
 import { authClient } from "~/lib/auth-client";
+import { useAppForm } from "./form/form-hook";
+import { useNavigate } from "@tanstack/react-router";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate();
   const form = useAppForm({
     defaultValues: {
       email: "",
       password: "",
     },
     onSubmit: async (props) => {
-      const res = await authClient.signIn.email({
-        email: props.value.email,
-        password: props.value.password,
-      });
-      if (res.data?.user) {
+      const res = await authClient.signIn
+        .email({
+          email: props.value.email,
+          password: props.value.password,
+        })
+        .catch((e) => {
+          toast.error(e.message);
+          return null;
+        });
+      if (res?.data?.user) {
+        toast.success("Login successful");
+        navigate({
+          to: "/",
+        });
       }
     },
   });
