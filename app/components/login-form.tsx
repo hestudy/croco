@@ -6,13 +6,14 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { authClient } from "~/lib/auth-client";
 import { useAppForm } from "./form/form-hook";
-import { useNavigate } from "@tanstack/react-router";
 
 export function LoginForm({
   className,
+  onOK,
   ...props
-}: React.ComponentProps<"div">) {
-  const navigate = useNavigate();
+}: React.ComponentProps<"div"> & {
+  onOK?: () => void;
+}) {
   const form = useAppForm({
     defaultValues: {
       email: "",
@@ -30,9 +31,7 @@ export function LoginForm({
         });
       if (res?.data?.user) {
         toast.success("Login successful");
-        navigate({
-          to: "/",
-        });
+        onOK?.();
       }
     },
   });
